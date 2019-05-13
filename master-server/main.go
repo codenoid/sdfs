@@ -11,7 +11,6 @@ import (
 
 import (
 	"./helper"
-	_ "./slave"
 )
 
 func symlink(w http.ResponseWriter, r *http.Request) {
