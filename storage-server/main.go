@@ -1,14 +1,14 @@
 package main
 
-import(
-	"os"
+import (
 	"fmt"
-	"strings"
-	"strconv"
-	"os/exec"
-	"net/url"
-	"net/http"
 	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 func is_ipv4(host string) bool {
@@ -17,12 +17,12 @@ func is_ipv4(host string) bool {
 	if len(parts) < 4 {
 		return false
 	}
-	
-	for _,x := range parts {
+
+	for _, x := range parts {
 		if i, err := strconv.Atoi(x); err == nil {
 			if i < 0 || i > 255 {
-			return false
-		}
+				return false
+			}
 		} else {
 			return false
 		}
@@ -32,36 +32,36 @@ func is_ipv4(host string) bool {
 }
 
 func standardizeSpaces(s string) string {
-    return strings.Join(strings.Fields(s), " ")
+	return strings.Join(strings.Fields(s), " ")
 }
 
 func exportsExist(line string) (bool, error) {
-    b, err := ioutil.ReadFile("/etc/exports")
-    if err != nil {
-        return false, err
-    }
+	b, err := ioutil.ReadFile("/etc/exports")
+	if err != nil {
+		return false, err
+	}
 
-    content := strings.Split(string(b), "\n")
+	content := strings.Split(string(b), "\n")
 
-    for _, eline := range content {
-    	if standardizeSpaces(eline) == line {
-    		return true, nil
-    	}
-    }
+	for _, eline := range content {
+		if standardizeSpaces(eline) == line {
+			return true, nil
+		}
+	}
 
-    return false, nil
+	return false, nil
 }
 
 func appendExports(line string) error {
 	f, err := os.OpenFile("/etc/exports", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-	    return err
+		return err
 	}
 
 	defer f.Close()
 
 	if _, err = f.WriteString(line); err != nil {
-	    return err
+		return err
 	}
 
 	return nil

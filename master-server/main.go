@@ -1,98 +1,98 @@
 package main
 
 import (
-    "os"
-    "fmt"
-    "strings"
-    "os/exec"
-    "net/http"
-    "path/filepath"
+	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
 import (
-    "./helper"
-    _"./slave"
+	"./helper"
+	_ "./slave"
 )
 
 func symlink(w http.ResponseWriter, r *http.Request) {
-    r.ParseForm()
+	r.ParseForm()
 
-    fpath := r.FormValue("path")
+	fpath := r.FormValue("path")
 
-    if fpath != "" {
-        brick, err := helper.AvailableBrick()
-        if err != nil {
-            http.Error(w, err.Error(), 500)
-            return
-        }
-        fi, err := os.Lstat(fpath)
-        
-        if err != nil {
-            http.Error(w, err.Error(), 500)
-            return
-        }
+	if fpath != "" {
+		brick, err := helper.AvailableBrick()
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		fi, err := os.Lstat(fpath)
 
-        if fi.Mode() & os.ModeSymlink == os.ModeSymlink {
-            // symlinked file
-        } else {
-            // /data/bricl1/
-            bpath := brick + fpath
-            
-            dirOnly := strings.Split(bpath, "/")
-            dirOnly  = dirOnly[:len(dirOnly)-1]
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
-            os.MkdirAll(strings.Join(dirOnly[:],"/"), os.ModePerm)
+		if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
+			// symlinked file
+		} else {
+			// /data/bricl1/
+			bpath := brick + fpath
 
-            helper.MoveFile(fpath, bpath)
+			dirOnly := strings.Split(bpath, "/")
+			dirOnly = dirOnly[:len(dirOnly)-1]
 
-            helper.Symlink(bpath, fpath)            
-        }
-    }
+			os.MkdirAll(strings.Join(dirOnly[:], "/"), os.ModePerm)
 
-    w.WriteHeader(200)
+			helper.MoveFile(fpath, bpath)
 
-    fmt.Fprintln(w, ":OK")
+			helper.Symlink(bpath, fpath)
+		}
+	}
+
+	w.WriteHeader(200)
+
+	fmt.Fprintln(w, ":OK")
 }
 
 func connect(w http.ResponseWriter, r *http.Request) {
-    r.ParseForm()
+	r.ParseForm()
 
-    path := r.FormValue("path")
-    uid := r.FormValue("id")
+	path := r.FormValue("path")
+	uid := r.FormValue("id")
 
-    if path != "" && uid != "" {
-        mpath := filepath.Join("/data", uid)
-        err := os.MkdirAll(mpath, os.ModePerm)
-        if err != nil {
-            http.Error(w, "Problem with folder creation", 500)
-            return
-        }
+	if path != "" && uid != "" {
+		mpath := filepath.Join("/data", uid)
+		err := os.MkdirAll(mpath, os.ModePerm)
+		if err != nil {
+			http.Error(w, "Problem with folder creation", 500)
+			return
+		}
 
-        // storage_ip:/path  /where/to/mount  nfs auto,_netdev,rw,hard,intr 0 0
-        fstab := "%v:%v %v nfs auto,_netdev,rw,hard,intr 0 0"
-        fstab = fmt.Sprintf(fstab, strings.Split(r.RemoteAddr, ":")[0], path, mpath)
+		// storage_ip:/path  /where/to/mount  nfs auto,_netdev,rw,hard,intr 0 0
+		fstab := "%v:%v %v nfs auto,_netdev,rw,hard,intr 0 0"
+		fstab = fmt.Sprintf(fstab, strings.Split(r.RemoteAddr, ":")[0], path, mpath)
 
-        check, err := helper.ExportsExist(fstab)
+		check, err := helper.ExportsExist(fstab)
 
-        if err == nil {
-            if check == false {
-                if err = helper.AppendExports(fstab); err == nil {
-                    exec.Command("/bin/mount", "-a").Run()
-                }
-            }
-        }
-    }
+		if err == nil {
+			if check == false {
+				if err = helper.AppendExports(fstab); err == nil {
+					exec.Command("/bin/mount", "-a").Run()
+				}
+			}
+		}
+	}
 
-    w.WriteHeader(200)
+	w.WriteHeader(200)
 
-    fmt.Fprintln(w, ":OK")
+	fmt.Fprintln(w, ":OK")
 }
 
 func main() {
-    http.HandleFunc("/api/symlink", symlink)
-    http.HandleFunc("/api/connect", connect)
-    
-    fmt.Println("Starting server ...")
+	http.HandleFunc("/api/symlink", symlink)
+	http.HandleFunc("/api/connect", connect)
 
-    http.ListenAndServe("0.0.0.0:2219", nil)
+	fmt.Println("Starting server ...")
+
+	http.ListenAndServe("0.0.0.0:2219", nil)
 }
