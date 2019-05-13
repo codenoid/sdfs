@@ -106,6 +106,8 @@ func main() {
 					return
 				}
 
+				exec.Command("/usr/sbin/exportfs", "-ra").Run()
+
 				fmt.Println(string(body[:]))
 			}
 		}
