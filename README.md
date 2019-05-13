@@ -1,4 +1,4 @@
-# SDFS
+# SDFS [![Go Report Card](https://goreportcard.com/badge/github.com/codenoid/sdfs)](https://goreportcard.com/report/github.com/codenoid/sdfs)
 
 Symlinked Distributed File System
 
