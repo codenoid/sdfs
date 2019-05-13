@@ -72,7 +72,7 @@ func main() {
 
 	switch argsWithoutProg[0] {
 	case "connect":
-		// connect 30.30.30.11 /var/app okloc
+		// connect 6.6.6.28 /var/app okloc
 		if len(argsWithoutProg) == 4 {
 			if is_ipv4(argsWithoutProg[1]) {
 				// /path ip(options,,)

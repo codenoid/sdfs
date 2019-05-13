@@ -68,7 +68,7 @@ func connect(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        // 30.30.30.12:/storage/wamon  /mnt/storage/wamon  nfs auto,_netdev,rw,hard,intr 0 0
+        // storage_ip:/path  /where/to/mount  nfs auto,_netdev,rw,hard,intr 0 0
         fstab := "%v:%v %v nfs auto,_netdev,rw,hard,intr 0 0"
         fstab = fmt.Sprintf(fstab, strings.Split(r.RemoteAddr, ":")[0], path, mpath)
 
