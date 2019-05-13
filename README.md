@@ -18,7 +18,7 @@ Current important feature that missing in SDFS is :
 
 ## Usage
 
-SDFS Hash 2 route API, `/api/connect` for combine new node and `/api/symlink` to tell the master what and where the file should i distribute accross available node, yes you can use FileSystem watcher, but what if you have thousand of directory ?, yeah more RAM (currently master-server only save symlink file)
+SDFS Has 2 route API, `/api/connect` for combine new node and `/api/symlink` to tell the master what and where the file should i distribute accross available node, yes you can use FileSystem watcher, but what if you have thousand of directory ?, yeah more RAM (currently master-server only save symlink file)
 
 > Tested in Ubuntu 16.04
 
