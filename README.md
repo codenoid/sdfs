@@ -41,6 +41,10 @@ SDFS Has 2 route API, `/api/connect` for combine new node and `/api/symlink` to 
 3. SDFS Will choose available storage-server and move the real file to storage-server then SDFS will create a symlink from storage-server to the first file path / saved file path
 4. You can easily use `connect` command to add new storage-server
 
+**or**
+
+1. use [File Mover](https://github.com/codenoid/sdfs/tree/master/services/file-mover)
+
 ```
 POST master-server.ip:2219/api/symlink
 # form url encoded, call this after you file has been saved
