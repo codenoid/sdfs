@@ -32,7 +32,7 @@ SDFS Has 2 route API, `/api/connect` for combine new node and `/api/symlink` to 
 
 1. create a directory to receive data from Master-Server
 2. install `sudo apt-get install nfs-kernel-server` (make sure /etc/exports are exist)
-3. build storage-server and run `./main connect 6.6.6.28 /path/to/receive/data storagenodeid` (6.6.6.28 is master ip address)
+3. build storage-server and run `./storage-server connect 6.6.6.28 /path/to/receive/data storagenodeid` (6.6.6.28 is master ip address)
 
 ### Example Usage
 
