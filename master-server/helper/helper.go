@@ -101,7 +101,7 @@ func AvailableBrick() (string, error) {
 			usage := NewDiskUsage(path)
 			used_percent := usage.Usage() * 100
 
-			if used_percent < 92 {
+			if used_percent < 93 {
 				return path, nil
 			}
 		}
