@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// check is given ip address is valid ip4
 func is_ipv4(host string) bool {
 	parts := strings.Split(host, ".")
 
@@ -35,6 +36,7 @@ func standardizeSpaces(s string) string {
 	return strings.Join(strings.Fields(s), " ")
 }
 
+// exportsExist : check is current line config already exist
 func exportsExist(line string) (bool, error) {
 	b, err := ioutil.ReadFile("/etc/exports")
 	if err != nil {
@@ -52,6 +54,7 @@ func exportsExist(line string) (bool, error) {
 	return false, nil
 }
 
+// appendExports : write line config to /etc/exports
 func appendExports(line string) error {
 	f, err := os.OpenFile("/etc/exports", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
@@ -79,18 +82,31 @@ func main() {
 				export := "%v %v(rw,async,no_subtree_check)"
 				export = fmt.Sprintf(export, argsWithoutProg[2], argsWithoutProg[1])
 
+				fmt.Println("checking if path already in /etc/export")
+
 				check, err := exportsExist(export)
 
-				if err == nil {
-					if check == false {
-						if err = appendExports(export); err == nil {
-							exec.Command("/bin/systemctl", "restart", "nfs-server").Run()
-						}
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				if check == false {
+
+					fmt.Println("writing new line to /etc/export")
+
+					if err = appendExports(export); err == nil {
+						fmt.Println("restarting nfs-server....")
+						exec.Command("/bin/systemctl", "restart", "nfs-server").Run()
+					} else {
+						fmt.Println(err)
+						return
 					}
 				}
 
 				master_url := fmt.Sprintf("http://%v:2219/api/connect", argsWithoutProg[1])
 
+				fmt.Println("sending path information to master storage")
 				resp, err := http.PostForm(master_url, url.Values{"path": {argsWithoutProg[2]}, "id": {argsWithoutProg[3]}})
 
 				if nil != err {
@@ -105,6 +121,8 @@ func main() {
 					fmt.Println(err)
 					return
 				}
+
+				fmt.Println("reloading exportfs")
 
 				exec.Command("/usr/sbin/exportfs", "-ra").Run()
 
